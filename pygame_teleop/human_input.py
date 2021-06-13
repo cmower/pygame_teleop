@@ -42,4 +42,4 @@ class HumanInputMode2(_HumanInput):
     """Car-like input"""
 
     def _map(self, h):
-        return numpy.array([max(0, h.y), h.x])
+        return numpy.array([h.y, h.x])

@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='pygame_teleop',
     version='0.1',
-    description='Simple pygame teleop.',
+    description='Tools for simple teleoperation examples/demos/experiments in PyGame.',
     url='https://github.com/cmower/pygame_teleop',
     author='Christopher E. Mower',
     author_email='chris.mower@ed.ac.uk',

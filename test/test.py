@@ -30,6 +30,7 @@ def main():
 
             # Update robot
             robot += max_vel*dt*human.get()
+            robot = numpy.clip(robot, 0, 1)
 
             # Update window
             window.reset()
@@ -42,6 +43,7 @@ def main():
             
     except KeyboardInterrupt:
         pass
+    
     except:
         print("-"*70)
         traceback.print_exc(file=sys.stdout)

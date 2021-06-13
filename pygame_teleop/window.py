@@ -45,8 +45,8 @@ class Window:
 
     def static_circle(self, center, radius):
         pygame.draw.circle(
-            self._static_surface,
-            color,
+            self._static_screen,
+            BLACK,
             self._to_pg_coords(center),
             float(self.width)*radius,
         )

@@ -57,6 +57,10 @@ class Window:
     def did_user_quit(self, events):
         return any(e.type == pygame.QUIT for e in events)
 
+    def get_mouse_pos(self):
+        x, y = pygame.mouse.get_pos()
+        return float(x)/float(self.width), float(y)/float(self.width)
+
     def reset(self):
         self._screen.blit(self._static_screen, (0, 0))
 

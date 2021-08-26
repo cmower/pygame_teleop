@@ -30,7 +30,7 @@ class Viewer:
 
 
     def static_line(self, color, start_pos, end_pos, width=1):
-        pygame.draw.aaline(self.static_surface, pygame.Color(color), start_pos, end_pos, width=width)
+        pygame.draw.line(self.static_surface, pygame.Color(color), start_pos, end_pos, width=width)
 
 
     def line(self, color, start_pos, end_pos, width=1):
@@ -44,4 +44,4 @@ class Viewer:
 
     def lines(self, color, points, width=1):
         closed = False  # in teleop, rarely want lines filled in
-        pygame.draw.aalines(self.surface, pygame.Color(color), closed, points, width=width)
+        pygame.draw.lines(self.surface, pygame.Color(color), closed, points, width=width)

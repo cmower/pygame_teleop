@@ -1,106 +1,123 @@
 import pygame
-from math import atan2, sin, cos, pi
-pygame.init()
+from .viewer import Viewer
 
-BLACK = pygame.Color('black')
-WHITE = pygame.Color('white')
-BLUE = pygame.Color('blue')
+"""
+Window implementations.
 
-class Window:
+Notes
+Every time you add a new Window sub-class, you need to update the
+Screen._init_windows method in the screen.py script - this is just a
+hard fact of life!
+"""
 
-    def __init__(self, width, bg_color=WHITE):
+class Window(Viewer):
 
-        # Setup
-        self.width = width
-        self._screen_dimensions = (self.width, self.width)
 
-        # Setup screen
-        self._screen = pygame.display.set_mode(self._screen_dimensions)
-        self._static_screen = pygame.Surface(self._screen_dimensions)
-        self._static_screen.fill(bg_color)
+    def __init__(self, config):
 
-        # Setup clock
-        self._clock = pygame.time.Clock()
+        # Initialize base class
+        self.config = config
+        Viewer.__init__(self, config['width'], config['height'], config['background_color'])
 
-    def _to_pg_coords(self, v):
-        return float(self.width)*pygame.math.Vector2(tuple(v))
+        # Initialize window
+        self._post_init()
 
-    def static_line(self, start_pos, end_pos, width=1, color=BLACK):
-        pygame.draw.line(
-            self._static_screen,
-            color,
-            self._to_pg_coords(start_pos),
-            self._to_pg_coords(end_pos),
-            width,
+
+    def _post_init(self):
+        pass
+
+
+class RobotEnvironment(Window):
+
+
+    def _post_init(self):
+
+        # Check dimensions
+        tol = 1e-5
+        w, h = float(self.config['robotenv_width']), float(self.config['robotenv_height']),
+        W, H = float(self.static_surface.get_width()), float(self.static_surface.get_height())
+        assert abs((w/h) - (W/H)) < tol, "aspect ratio is not consistent between pygame window and robot environment"
+
+        self.robotenv_origin_location = self.config.get('robotenv_origin_location', 'upper_left')
+        self._convert_position = getattr(self, f'_convert_position_{self.robotenv_origin_location}')
+        if self.robotenv_origin_location == 'upper_right':
+            raise NotImplementedError("since this error was raised, there is now a need to implement upper_right use-case, see RobotEnvironment class.")
+
+
+    def _convert_position_upper_left(self, x, y, w, h, W, H):
+        return W*x/w, H*y/h
+
+
+    def _convert_position_lower_left(self, x, y, w, h, W, H):
+        return W*x/w, (H/h)*(h-y)
+
+    def _convert_position_lower_right(self, x, y, w, h, W, H):
+        return (W/w)*(w-x), (H/h)*(h-y)
+
+
+    def convert_position(self, pos):
+        X, Y = self._convert_position(  # see _post_init re _convert_position
+            float(pos[0]), float(pos[1]),
+            float(self.config['robotenv_width']), float(self.config['robotenv_height']),
+            float(self.static_surface.get_width()), float(self.static_surface.get_height())
         )
+        return int(round(X)), int(round(Y))
 
-    def static_lines(self, points, width=1, color=BLACK):
-        pygame.draw.lines(
-            self._static_screen,
-            color,
-            False,
-            [self._to_pg_coords(p) for p in points],
-            width,
-        )
 
-    def static_circle(self, center, radius, color=BLACK):
-        pygame.draw.circle(
-            self._static_screen,
-            color,
-            self._to_pg_coords(center),
-            float(self.width)*radius,
-        )
+class Joystick(Window):
 
-    def events(self):
-        return pygame.event.get()
 
-    def did_user_quit(self, events):
-        return any(e.type == pygame.QUIT for e in events)
+    def _post_init(self):
 
-    def get_mouse_pos(self):
-        x, y = pygame.mouse.get_pos()
-        return float(x)/float(self.width), float(y)/float(self.width)
+        # Check dimensions
+        assert self.config['width'] == self.config['height'], "width and height must be the same for Joystick"
 
-    def reset(self):
-        self._screen.blit(self._static_screen, (0, 0))
+        # Compute tip radius, mid width, and width
+        D = float(self.config['width'])
+        self.tip_radius = 0.075*D  # d0
+        self.mid_width = D - 2*self.tip_radius  # d1
+        self.joy_width = int(round(0.5*self.tip_radius))
 
-    def line(self, start_pos, end_pos, width=1, color=BLACK):
-        pygame.draw.line(
-            self._screen,
-            color,
-            self._to_pg_coords(start_pos),
-            self._to_pg_coords(end_pos),
-            width,
-        )
+        # Setup joystick base
+        self.joy_color = self.config.get('joy_color', 'darkgrey')
+        self.middle = (int(round(D/2.0)), int(round(D/2.0)))
+        self.static_circle(self.joy_color, self.middle, int(round(self.tip_radius)))
 
-    def lines(self, points, width=1, color=BLACK):
-        pygame.draw.lines(
-            self._screen,
-            color,
-            False,
-            [self._to_pg_coords(p) for p in points],
-            width,
-        )
+        if self.config.get('flip_a0', False):
+            self._flip_a0 = self._do_flip
+        else:
+            self._flip_a0 = self._dont_flip
 
-    def cirle(self, center, radius, color=BLACK):
-        pygame.draw.circle(
-            self._screen,
-            color,
-            self._to_pg_coords(center),
-            float(self.width)*radius,
-        )
+        if self.config.get('flip_a1', False):
+            self._flip_a1 = self._do_flip
+        else:
+            self._flip_a1 = self._dont_flip
 
-    def robot(self, position, radius, color=BLUE):
-        pygame.draw.circle(
-            self._screen,
-            color,
-            self._to_pg_coords(position),
-            float(self.width)*radius,
-        )
+        # Get tip color
+        self.joy_tip_color = pygame.Color(self.config.get('joy_tip_color', 'red'))
 
-    def update(self, hz):
-        pygame.display.flip()
-        self._clock.tick(hz)
 
-    def shutdown(self):
-        pygame.quit()
+    def _dont_flip(self, a):
+        return a
+
+
+    def _do_flip(self, a):
+        return -1.0 * a
+
+
+    def draw(self, axes):
+
+        # Setup, see _post_init re _flip_a0 and _flip_a1
+        a0 = self._flip_a0(axes[0])
+        a1 = self._flip_a1(axes[1])
+
+        # Compute location
+        x = 0.5*(a0 + 1.0)
+        y = 0.5*(a1 + 1.0)
+        X = int(round(self.tip_radius + x*self.mid_width))
+        Y = int(round(self.tip_radius + y*self.mid_width))
+        pos = (X, Y)
+
+        # Draw
+        self.line(self.joy_color, self.middle, pos, self.joy_width)
+        self.circle(self.joy_tip_color, pos, self.tip_radius)

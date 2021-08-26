@@ -21,7 +21,7 @@ class Screen(Viewer):
 
 
     def _init_windows(self):
-        from .window import RobotEnvironment, Joystick
+        from .window import RobotEnvironment, Joystick, TimeSeries
         # Note, "from .window import *" throws syntax error. Will have
         # to update this when ever I add a new class in the window.py
         # script.

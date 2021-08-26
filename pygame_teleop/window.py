@@ -1,4 +1,6 @@
 import pygame
+import numpy
+from scipy.interpolate import interp1d
 from .viewer import Viewer
 
 """
@@ -121,3 +123,56 @@ class Joystick(Window):
         # Draw
         self.line(self.joy_color, self.middle, pos, self.joy_width)
         self.circle(self.joy_tip_color, pos, self.tip_radius)
+
+
+class TimeSeries(Window):
+
+
+    def _post_init(self):
+        self.n = self.config.get('n', 50)
+        if self.config.get('show_axis', True):
+            axis_width = self.config.get('axis_width', 1)
+            axis_color = self.config.get('axis_color', 'black')
+            self.static_line(axis_color, (0, self.config['height']/2), (self.config['width'], self.config['height']/2), axis_width)
+            tp = float(self.config['tp'])
+            tf = float(self.config['tf'])
+            W = float(self.config['width'])
+            M = int(round(tp*W/(tp+tf)))
+            self.static_line(axis_color, (M, 0), (M, self.config['height']), axis_width)
+
+
+    def plot_point(self, t, y, color, radius=2):
+
+        # Convert to pygame coordinates
+        t = (t + self.config['tp']) / (self.config['tp'] + self.config['tf'])
+        T = int(round(self.config['width']*t))
+
+        y = (y + abs(self.config['y_lo'])) / (abs(self.config['y_lo']) + abs(self.config['y_up']))
+        Y = int(round((self.config['height']*y)))
+
+        # Draw
+        self.circle(color, (T, Y), radius)
+
+
+    def plot_line(self, t, y, color, line_width=1):
+
+        # Interpolate data
+        yfun = interp1d(t, y, bounds_error=False, fill_value='extrapolate')
+
+        # Downsample data
+        t_lo = max(t.min(), -self.config['tp'])
+        t_up = min(t.max(), self.config['tf'])
+        t_use = numpy.linspace(t_lo, t_up, self.n)
+        y_use = yfun(t_use)
+
+        # Convert to pygame coordinates
+        t_use = (t_use + self.config['tp']) / (self.config['tp'] + self.config['tf'])
+        T = (self.config['width']*t_use).round().astype(int)
+
+        y_use = (y_use + abs(self.config['y_lo'])) / (abs(self.config['y_lo']) + abs(self.config['y_up']))
+        Y = (self.config['height']*y_use).round().astype(int)
+
+        points = numpy.stack((T, Y)).T.tolist()
+
+        # Draw
+        self.lines(color, points, width=line_width)

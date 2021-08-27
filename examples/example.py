@@ -36,6 +36,13 @@ def main():
                 'robotenv_width': 1.0,
                 'robotenv_height': float(w2)/float(w1),
                 'robotenv_origin_location': 'lower_left',
+                'robots': {
+                    'robot1': {
+                        'robot_radius': 0.025,
+                        'show_path': False,
+                        'robot_color': 'blue',
+                    }
+                }
             }
         }
     }
@@ -73,12 +80,11 @@ def main():
             # Update robot
             x += dt*h*max_vel
             x = numpy.clip(x, [0, 0], [1, float(w2)/float(w1)])
-            x_pg = screen.windows['robotenv'].convert_position(x)
 
             # Update screen
             screen.reset()
             screen.windows['joy'].draw(axes)
-            screen.windows['robotenv'].circle('blue', x_pg, x_radius)
+            screen.windows['robotenv'].robots['robot1'].draw(x)
             screen.final()
 
             # Tick

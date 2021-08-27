@@ -29,6 +29,27 @@ class Window(Viewer):
         pass
 
 
+class Robot:
+
+
+    def __init__(self, robotenv, config):
+        self.robotenv = robotenv
+        self.config = config
+        self.previous_position = None
+        self.robot_radius = robotenv.convert_scalar(self.config['robot_radius'])
+        self.show_path = self.config.get('show_path', True)
+        self.path_width = self.config.get('path_width', 1)
+        self.path_color = self.config.get('path_color', 'black')  # NOTE, if you can't see the path, is your background black?
+
+
+    def draw(self, x):
+        x_use = self.robotenv.convert_position(x)
+        if (self.previous_position is not None) and self.show_path:
+            self.robotenv.static_line(self.path_color, self.previous_position, x_use, self.path_width)
+        self.robotenv.circle(self.config['robot_color'], x_use, self.robot_radius)
+        self.previous_position = x_use
+
+
 class RobotEnvironment(Window):
 
 
@@ -45,6 +66,9 @@ class RobotEnvironment(Window):
         self._convert_position = getattr(self, f'_convert_position_{self.robotenv_origin_location}')
         if self.robotenv_origin_location == 'upper_right':
             raise NotImplementedError("since this error was raised, there is now a need to implement upper_right use-case, see RobotEnvironment class.")
+
+        # Setup robots
+        self.robots = {name: Robot(self, config) for name, config in self.config['robots'].items()}
 
 
     def _convert_position_upper_left(self, x, y, w, h, W, H):

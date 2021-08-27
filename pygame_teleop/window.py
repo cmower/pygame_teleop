@@ -39,6 +39,7 @@ class RobotEnvironment(Window):
         w, h = float(self.config['robotenv_width']), float(self.config['robotenv_height']),
         W, H = float(self.static_surface.get_width()), float(self.static_surface.get_height())
         assert abs((w/h) - (W/H)) < tol, "aspect ratio is not consistent between pygame window and robot environment"
+        self.k = W/w  # scaling factor
 
         self.robotenv_origin_location = self.config.get('robotenv_origin_location', 'upper_left')
         self._convert_position = getattr(self, f'_convert_position_{self.robotenv_origin_location}')
@@ -55,6 +56,10 @@ class RobotEnvironment(Window):
 
     def _convert_position_lower_right(self, x, y, w, h, W, H):
         return (W/w)*(w-x), (H/h)*(h-y)
+
+
+    def convert_scalar(self, s):
+        return int(round(self.k*float(s)))
 
 
     def convert_position(self, pos):

@@ -94,6 +94,19 @@ class RobotEnvironment(Window):
         )
         return int(round(X)), int(round(Y))
 
+    def convert_path(self, path):
+
+        # Extract x, y and ensure float type
+        x = path[0,:].astype(float)
+        y = path[1,:].astype(float)
+
+        X, Y = self._convert_position(
+            x, y,
+            float(self.config['robotenv_width']), float(self.config['robotenv_height']),
+            float(self.static_surface.get_width()), float(self.static_surface.get_height()),
+        )
+
+        return numpy.stack((X, Y)).round().astype(int)
 
 class Joystick(Window):
 

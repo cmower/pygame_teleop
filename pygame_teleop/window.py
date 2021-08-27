@@ -12,6 +12,7 @@ Screen._init_windows method in the screen.py script - this is just a
 hard fact of life!
 """
 
+
 class Window(Viewer):
 
 
@@ -78,6 +79,7 @@ class RobotEnvironment(Window):
     def _convert_position_lower_left(self, x, y, w, h, W, H):
         return W*x/w, (H/h)*(h-y)
 
+
     def _convert_position_lower_right(self, x, y, w, h, W, H):
         return (W/w)*(w-x), (H/h)*(h-y)
 
@@ -90,7 +92,7 @@ class RobotEnvironment(Window):
         X, Y = self._convert_position(  # see _post_init re _convert_position
             float(pos[0]), float(pos[1]),
             float(self.config['robotenv_width']), float(self.config['robotenv_height']),
-            float(self.static_surface.get_width()), float(self.static_surface.get_height())
+            float(self.static_surface.get_width()), float(self.static_surface.get_height()),
         )
         return int(round(X)), int(round(Y))
 

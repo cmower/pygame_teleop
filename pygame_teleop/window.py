@@ -203,7 +203,7 @@ class TimeSeries(Window):
         self.circle(color, (T, Y), radius)
 
 
-    def plot_line(self, t, y, color, line_width=1):
+    def plot_line(self, t, y, color, line_width=1, dashed=False, dash_length=10):
 
         # Interpolate data
         yfun = interp1d(t, y, bounds_error=False, fill_value='extrapolate')
@@ -224,4 +224,7 @@ class TimeSeries(Window):
         points = numpy.stack((T, Y)).T.tolist()
 
         # Draw
-        self.lines(color, points, width=line_width)
+        if dashed:
+            self.dashed_lines(color, points, width=line_width, dash_length=dash_length)
+        else:
+            self.lines(color, points, width=line_width)

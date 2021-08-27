@@ -108,6 +108,13 @@ class RobotEnvironment(Window):
 
         return numpy.stack((X, Y)).round().astype(int)
 
+    def draw_path(self, color, path, width=1, dashed=False):
+        if dashed:
+            self.dashed_lines(color, self.convert_path(path).T.tolist(), width)
+        else:
+            self.lines(color, self.convert_path(path).T.tolist(), width)
+
+
 class Joystick(Window):
 
 

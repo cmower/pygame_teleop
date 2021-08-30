@@ -71,6 +71,15 @@ class RobotEnvironment(Window):
         # Setup robots
         self.robots = {name: Robot(self, config) for name, config in self.config['robots'].items()}
 
+        # Include origin
+        if self.config.get('show_origin', False):
+            axis_scale = 0.1
+            origin_center = self.convert_position((0, 0))
+            line_width = self.convert_scalar(w*0.01)
+            self.static_line('red', origin_center, self.convert_position((w*axis_scale, 0)), width=line_width)  # x axis
+            self.static_line('green', origin_center, self.convert_position((0, h*axis_scale)), width=line_width)  # y axis
+            self.static_circle('blue', origin_center, self.convert_scalar(w*0.0175))
+
 
     def _convert_position_upper_left(self, x, y, w, h, W, H):
         return W*x/w, H*y/h

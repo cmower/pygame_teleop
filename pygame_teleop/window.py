@@ -69,6 +69,7 @@ class RobotEnvironment(Window):
 
         self.robotenv_origin_location = self.config.get('robotenv_origin_location', 'upper_left')
         self._convert_position = getattr(self, f'_convert_position_{self.robotenv_origin_location}')
+        self._revert_position = getattr(self, f"_convert_position_{self.robotenv_origin_location}")
         if self.robotenv_origin_location == 'upper_right':
             raise NotImplementedError("since this error was raised, there is now a need to implement upper_right use-case, see RobotEnvironment class.")
 
@@ -89,14 +90,24 @@ class RobotEnvironment(Window):
         return self.W*x/self.w, self.H*y/self.h
 
 
+    def _revert_position_upper_left(self, X, Y):
+        return self.w*X/self.W, self.h*Y/self.H
+
 
     def _convert_position_lower_left(self, x, y):
         return self.W*x/self.w, (self.H/self.h)*(self.h-y)
 
 
+    def _revert_position_lower_left(self, X, Y):
+        return self.w*X/self.W, self.h*(1.0-Y/self.H)
+
 
     def _convert_position_lower_right(self, x, y):
         return (self.W/self.w)*(self.w-x), (self.H/self.h)*(self.h-y)
+
+
+    def _revert_position_lower_right(self, x, y):
+        return self.w*(1.0-X/self.W), (self.H/self.h)*(self.h-y)
 
 
     def convert_scalar(self, s):
@@ -108,6 +119,11 @@ class RobotEnvironment(Window):
             float(pos[0]), float(pos[1]),
         )
         return int(round(X)), int(round(Y))
+
+
+    def revert_position(self, pos):
+        return self._revert_position(float(pos[0]), float(pos[1]))
+
 
     def convert_path(self, path):
 

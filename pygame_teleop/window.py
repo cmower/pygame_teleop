@@ -95,7 +95,7 @@ class RobotEnvironment(Window):
 
 
 
-    def _convert_position_lower_right(self, x, y, w, h, W, H):
+    def _convert_position_lower_right(self, x, y):
         return (self.W/self.w)*(self.w-x), (self.H/self.h)*(self.h-y)
 
 

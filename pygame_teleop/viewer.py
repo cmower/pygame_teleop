@@ -134,14 +134,14 @@ class Viewer:
 
 
     def _gen_rect_points(self, pos, width, height, rotation):
-        points = numpy.array([
+        corners = numpy.array([
             [0, 1, 1, 0],
             [0, 0, 1, 1],
         ], dtype=float)
         t = numpy.diag(pos) @ numpy.ones(points.shape)
         R = Rotation.from_euler('z', rotation, degrees=True).as_matrix()[:2,:2]
         S = numpy.diag([width, height])
-        return (t + R @ S @ points).round().astype(int).T.tolist()
+        return (t + R @ S @ corners).round().astype(int).T.tolist()
 
 
     def static_rectangle(self, color, top_left_corner_pos, width, height, rotation):

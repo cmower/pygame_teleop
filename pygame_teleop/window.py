@@ -144,6 +144,11 @@ class RobotEnvironment(Window):
             self.lines(color, self.convert_path(path).T.tolist(), width)
 
 
+    def get_mouse_position(self):
+        xscreen, yscreen = pygame.mouse.get_pos()
+        return self.revert_position(self.config['origin'][0] - xscreen, self.config['origin'][1] - yscreen)
+
+
 class Joystick(Window):
 
 

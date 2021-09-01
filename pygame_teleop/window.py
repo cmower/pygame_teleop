@@ -74,7 +74,7 @@ class RobotEnvironment(Window):
             raise NotImplementedError("since this error was raised, there is now a need to implement upper_right use-case, see RobotEnvironment class.")
 
         # Setup robots
-        self.robots = {name: Robot(self, config) for name, config in self.config['robots'].items()}
+        self.robots = {name: Robot(self, config) for name, config in self.config.get('robots', {}).items()}
 
         # Include origin
         if self.config.get('show_origin', False):

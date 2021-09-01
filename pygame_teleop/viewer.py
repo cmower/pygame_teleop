@@ -1,5 +1,7 @@
 import pygame
 import math
+import numpy
+from scipy.spatial.transform import Rotation
 
 
 def _draw_dashed_line(surf, color, start_pos, end_pos, width=1, dash_length=10):
@@ -129,3 +131,22 @@ class Viewer:
 
     def dashed_lines(self, color, points, width=1, dash_length=10):
         _draw_dashed_lines(self.surface, color, points, width, dash_length)
+
+
+    def _gen_rect_points(self, pos, width, height, rotation):
+        points = numpy.array([
+            [0, 1, 1, 0],
+            [0, 0, 1, 1],
+        ], dtype=float)
+        t = numpy.diag(pos) @ numpy.ones(points.shape)
+        R = Rotation.from_euler('z', rotation, degrees=True).as_matrix()[:2,:2]
+        S = numpy.diag([width, height])
+        return (t + R @ S @ points).round().astype(int).T.tolist()
+
+
+    def static_rectangle(self, color, top_left_corner_pos, width, height, rotation):
+        pygame.draw.polygon(self.static_surface, color, self._gen_rect_points(pos, width, height, rotation))
+
+
+    def rectangle(self, color, top_left_corner_pos, width, height, rotation):
+        pygame.draw.polygon(self.surface, color, self._gen_rect_points(pos, width, height, rotation))

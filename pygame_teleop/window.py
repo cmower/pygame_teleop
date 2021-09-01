@@ -62,6 +62,10 @@ class RobotEnvironment(Window):
         W, H = float(self.static_surface.get_width()), float(self.static_surface.get_height())
         assert abs((w/h) - (W/H)) < tol, "aspect ratio is not consistent between pygame window and robot environment"
         self.k = W/w  # scaling factor
+        self.w = w
+        self.h = h
+        self.W = W
+        self.H = H
 
         self.robotenv_origin_location = self.config.get('robotenv_origin_location', 'upper_left')
         self._convert_position = getattr(self, f'_convert_position_{self.robotenv_origin_location}')
@@ -81,16 +85,18 @@ class RobotEnvironment(Window):
             self.static_circle('blue', origin_center, self.convert_scalar(w*0.0175))
 
 
-    def _convert_position_upper_left(self, x, y, w, h, W, H):
-        return W*x/w, H*y/h
+    def _convert_position_upper_left(self, x, y):
+        return self.W*x/self.w, self.H*y/self.h
 
 
-    def _convert_position_lower_left(self, x, y, w, h, W, H):
-        return W*x/w, (H/h)*(h-y)
+
+    def _convert_position_lower_left(self, x, y):
+        return self.W*x/self.w, (self.H/self.h)*(self.h-y)
+
 
 
     def _convert_position_lower_right(self, x, y, w, h, W, H):
-        return (W/w)*(w-x), (H/h)*(h-y)
+        return (self.W/self.w)*(self.w-x), (self.H/self.h)*(self.h-y)
 
 
     def convert_scalar(self, s):
@@ -100,8 +106,6 @@ class RobotEnvironment(Window):
     def convert_position(self, pos):
         X, Y = self._convert_position(  # see _post_init re _convert_position
             float(pos[0]), float(pos[1]),
-            float(self.config['robotenv_width']), float(self.config['robotenv_height']),
-            float(self.static_surface.get_width()), float(self.static_surface.get_height()),
         )
         return int(round(X)), int(round(Y))
 
@@ -111,11 +115,8 @@ class RobotEnvironment(Window):
         x = path[0,:].astype(float)
         y = path[1,:].astype(float)
 
-        X, Y = self._convert_position(
-            x, y,
-            float(self.config['robotenv_width']), float(self.config['robotenv_height']),
-            float(self.static_surface.get_width()), float(self.static_surface.get_height()),
-        )
+        # Convert position
+        X, Y = self._convert_position(x, y)
 
         return numpy.stack((X, Y)).round().astype(int)
 

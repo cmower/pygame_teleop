@@ -69,7 +69,7 @@ class RobotEnvironment(Window):
 
         self.robotenv_origin_location = self.config.get('robotenv_origin_location', 'upper_left')
         self._convert_position = getattr(self, f'_convert_position_{self.robotenv_origin_location}')
-        self._revert_position = getattr(self, f"_convert_position_{self.robotenv_origin_location}")
+        self._revert_position = getattr(self, f"_revert_position_{self.robotenv_origin_location}")
         if self.robotenv_origin_location == 'upper_right':
             raise NotImplementedError("since this error was raised, there is now a need to implement upper_right use-case, see RobotEnvironment class.")
 

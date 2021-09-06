@@ -30,12 +30,18 @@ class Window(Viewer):
         pass
 
 
-class Robot:
-
+class EnvironmentObject:
 
     def __init__(self, robotenv, config):
         self.robotenv = robotenv
         self.config = config
+
+
+class Robot(EnvironmentObject):
+
+
+    def __init__(self, robotenv, config):
+        EnvironmentObject.__init__(self, robotenv, config)
         self.previous_position = None
         self.robot_radius = robotenv.convert_scalar(self.config['robot_radius'])
         self.show_path = self.config.get('show_path', True)
@@ -49,6 +55,17 @@ class Robot:
             self.robotenv.static_line(self.path_color, self.previous_position, x_use, self.path_width)
         self.robotenv.circle(self.config['robot_color'], x_use, self.robot_radius)
         self.previous_position = x_use
+
+class Box(environmentObject):
+
+
+    def __init__(self, robotenv, config):
+        EnvironmentObject.__init__(self, robotenv, config)
+        self.box_width = robotenv.convert_scalar(self.config['box_width'])
+        self.box_height = robotenv.convert_scalar(self.config['box_height'])
+        init_pos = self.config.get('position', 
+
+
 
 
 class RobotEnvironment(Window):

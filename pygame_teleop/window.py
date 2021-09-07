@@ -56,19 +56,14 @@ class Robot(EnvironmentObject):
         self.robotenv.circle(self.config['robot_color'], x_use, self.robot_radius)
         self.previous_position = x_use
 
-class Box(environmentObject):
-
-
-    def __init__(self, robotenv, config):
-        EnvironmentObject.__init__(self, robotenv, config)
-        self.box_width = robotenv.convert_scalar(self.config['box_width'])
-        self.box_height = robotenv.convert_scalar(self.config['box_height'])
-        init_pos = self.config.get('position', 
-
-
-
 
 class RobotEnvironment(Window):
+
+    rotation_direction = {
+        'lower_left': -1.0,
+        'upper_left': 1.0,
+        'lower_right': 1.0,
+    }
 
 
     def _post_init(self):
@@ -159,6 +154,10 @@ class RobotEnvironment(Window):
             self.dashed_lines(color, self.convert_path(path).T.tolist(), width)
         else:
             self.lines(color, self.convert_path(path).T.tolist(), width)
+
+    def draw_box(self, color, width, height, center_pos, rotation=0):
+        r = self.rotation_direction[self.robotenv_origin_location]*numpy.rad2deg(rotation)
+        self.rectangle(color, self.convert_scalar(width), self.convert_scalar(height), self.convert_position(center_pos), r)
 
 
     def get_mouse_position(self):

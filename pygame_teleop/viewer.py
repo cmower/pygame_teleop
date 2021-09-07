@@ -134,29 +134,19 @@ class Viewer:
 
 
     def _gen_rect_points(self, pos, width, height, rotation):
-        corners = numpy.array([
-            [0, 1, 1, 0],
-            [0, 0, 1, 1],
+        corners = 0.5*numpy.array([
+            [-1,  1, 1, -1],
+            [-1, -1, 1,  1],
         ], dtype=float)
-        t = numpy.diag(pos) @ numpy.ones(points.shape)
+        t = numpy.diag(pos) @ numpy.ones(corners.shape, dtype=float)
         R = Rotation.from_euler('z', rotation, degrees=True).as_matrix()[:2,:2]
         S = numpy.diag([width, height])
         return (t + R @ S @ corners).round().astype(int).T.tolist()
 
 
-    def static_rectangle(self, color, width, height, top_left_corner_pos=None, center_pos=None, rotation=0):
-        pygame.draw.polygon(self.static_surface, color, self._gen_rect_points(pos, width, height, rotation))
+    def static_rectangle(self, color, width, height, top_left_corner_pos, rotation=0):
+        pygame.draw.polygon(self.static_surface, color, self._gen_rect_points(top_left_corner_pos, width, height, rotation))
 
 
-    def rectangle(self, color, width, height, top_left_corner_pos=None, center_pos=None, rotation=0):
-
-        # Check at least one position is given
-        if ((top_left_corner_pos is None) and (center_pos is None)) or ((top_left_corner_pos is not None) and (center_pos is not None)):
-            raise ValueError('You must give a position, either top_left_corner_pos or center_pos, but not both.')
-
-        # If top left corner position is given, use it, otherwise use the center position
-        if top_left_corner_pos is not None:
-            pos = top_left_corner_pos
-        else:
-
-        pygame.draw.polygon(self.surface, color, self._gen_rect_points(pos, width, height, rotation))
+    def rectangle(self, color, width, height, top_left_corner_pos, rotation=0):
+        pygame.draw.polygon(self.surface, color, self._gen_rect_points(top_left_corner_pos, width, height, rotation))

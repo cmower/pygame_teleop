@@ -134,19 +134,19 @@ class Viewer:
 
 
     def _gen_rect_points(self, pos, width, height, rotation):
-        corners = numpy.array([
-            [0, 1, 1, 0],
-            [0, 0, 1, 1],
+        corners = 0.5*numpy.array([
+            [-1,  1, 1, -1],
+            [-1, -1, 1,  1],
         ], dtype=float)
-        t = numpy.diag(pos) @ numpy.ones(points.shape)
+        t = numpy.diag(pos) @ numpy.ones(corners.shape, dtype=float)
         R = Rotation.from_euler('z', rotation, degrees=True).as_matrix()[:2,:2]
         S = numpy.diag([width, height])
         return (t + R @ S @ corners).round().astype(int).T.tolist()
 
 
-    def static_rectangle(self, color, top_left_corner_pos, width, height, rotation):
-        pygame.draw.polygon(self.static_surface, color, self._gen_rect_points(pos, width, height, rotation))
+    def static_rectangle(self, color, width, height, top_left_corner_pos, rotation=0):
+        pygame.draw.polygon(self.static_surface, color, self._gen_rect_points(top_left_corner_pos, width, height, rotation))
 
 
-    def rectangle(self, color, top_left_corner_pos, width, height, rotation):
-        pygame.draw.polygon(self.surface, color, self._gen_rect_points(pos, width, height, rotation))
+    def rectangle(self, color, width, height, top_left_corner_pos, rotation=0):
+        pygame.draw.polygon(self.surface, color, self._gen_rect_points(top_left_corner_pos, width, height, rotation))

@@ -26,7 +26,7 @@ class Screen(Viewer):
         # to update this when ever I add a new class in the window.py
         # script.
         self.windows = {}
-        for name, config in self.config['windows'].items():
+        for name, config in self.config.get('windows', {}).items():
             class_type = config['type']
             self.windows[name] = eval(f'{class_type}(config)')
             print("Initialized window:", name)

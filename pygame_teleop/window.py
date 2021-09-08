@@ -156,9 +156,9 @@ class RobotEnvironment(Window):
         else:
             self.lines(color, self.convert_path(path).T.tolist(), width)
 
-    def draw_box(self, color, width, height, center_pos, rotation=0):
+    def draw_box(self, color, width, height, center_pos, rotation=0, alpha=255):
         r = self.rotation_direction[self.robotenv_origin_location]*numpy.rad2deg(rotation)
-        self.rectangle(color, self.convert_scalar(width), self.convert_scalar(height), self.convert_position(center_pos), r)
+        self.rectangle(color, self.convert_scalar(width), self.convert_scalar(height), self.convert_position(center_pos), r, alpha=alpha)
 
 
     def get_mouse_position(self):

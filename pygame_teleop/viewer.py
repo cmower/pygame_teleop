@@ -144,9 +144,41 @@ class Viewer:
         return (t + R @ S @ corners).round().astype(int).T.tolist()
 
 
-    def static_rectangle(self, color, width, height, top_left_corner_pos, rotation=0):
-        pygame.draw.polygon(self.static_surface, color, self._gen_rect_points(top_left_corner_pos, width, height, rotation))
+    def static_rectangle(self, color, width, height, top_left_corner_pos, rotation=0, alpha=255):
+
+        # Setup color
+        c = pygame.Color(color)
+        c.a = alpha
+
+        # Generate points of rectangle
+        points = self._gen_rect_points(top_left_corner_pos, width, height, rotation)
+
+        # Draw on temp surface
+        lx, ly = zip(*points)
+        min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
+        target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+        shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+        pygame.draw.polygon(shape_surf, c, [(x - min_x, y - min_y) for x, y in points])
+
+        # Draw on surface
+        self.static_surface.blit(shape_surf, target_rect)
 
 
-    def rectangle(self, color, width, height, top_left_corner_pos, rotation=0):
-        pygame.draw.polygon(self.surface, color, self._gen_rect_points(top_left_corner_pos, width, height, rotation))
+    def rectangle(self, color, width, height, top_left_corner_pos, rotation=0, alpha=255):
+
+        # Setup color
+        c = pygame.Color(color)
+        c.a = alpha
+
+        # Generate points of rectangle
+        points = self._gen_rect_points(top_left_corner_pos, width, height, rotation)
+
+        # Draw on temp surface
+        lx, ly = zip(*points)
+        min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
+        target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+        shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+        pygame.draw.polygon(shape_surf, c, [(x - min_x, y - min_y) for x, y in points])
+
+        # Draw on surface
+        self.surface.blit(shape_surf, target_rect)

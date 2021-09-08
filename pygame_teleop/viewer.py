@@ -3,6 +3,12 @@ import math
 import numpy
 from scipy.spatial.transform import Rotation
 
+"""
+TODO:
+- Give all drawing functions an alpha value, see https://stackoverflow.com/a/64630102
+- Once above is done, check window.py has alpha features too
+"""
+
 
 def _draw_dashed_line(surf, color, start_pos, end_pos, width=1, dash_length=10):
     """Helper function for drawing dashed lines. Thanks to https://codereview.stackexchange.com/a/70206"""

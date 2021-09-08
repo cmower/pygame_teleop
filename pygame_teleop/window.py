@@ -64,6 +64,7 @@ class RobotEnvironment(Window):
         'lower_left': -1.0,
         'upper_left': 1.0,
         'lower_right': 1.0,
+        'center': -1.0,
     }
 
 
@@ -98,6 +99,11 @@ class RobotEnvironment(Window):
             self.static_line('green', origin_center, self.convert_position((0, h*axis_scale)), width=line_width)  # y axis
             self.static_circle('blue', origin_center, self.convert_scalar(w*0.0175))
 
+    def _convert_position_center(self, x, y):
+        return (0.5*self.w+x)*self.W/self.w, (0.5*self.h-y)*self.H/self.h
+
+    def _revert_position_center(self, X, Y):
+        return (X*self.w/self.W) - 0.5*self.w, 0.5*self.h - Y*self.h/self.H
 
     def _convert_position_upper_left(self, x, y):
         return self.W*x/self.w, self.H*y/self.h

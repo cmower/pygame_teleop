@@ -20,6 +20,7 @@ class Window(Viewer):
 
         # Initialize base class
         self.config = config
+        self.z_order = config.get('zorder', 0)
         Viewer.__init__(self, config['width'], config['height'], config['background_color'])
 
         # Initialize window

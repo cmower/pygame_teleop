@@ -40,6 +40,7 @@ class Screen(Viewer):
 
     def final(self):
         self.screen.blit(self.surface, (0, 0))
-        for window in self.windows.values():
+        windows = sorted(self.windows.values(), key=lambda x: x.z_order)
+        for window in windows:
             self.screen.blit(window.surface, window.config['origin'])
         pygame.display.flip()

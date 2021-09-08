@@ -132,26 +132,21 @@ class Viewer:
     def dashed_lines(self, color, points, width=1, dash_length=10):
         _draw_dashed_lines(self.surface, color, points, width, dash_length)
 
+    def _rectangle(self, surface, color, width, height, top_left_corner_pos, rotation=0, alpha=255):
 
-    def _gen_rect_points(self, pos, width, height, rotation):
+        # Setup color
+        c = pygame.Color(color)
+        c.a = alpha
+
+        # Generate points of rectangle
         corners = 0.5*numpy.array([
             [-1,  1, 1, -1],
             [-1, -1, 1,  1],
         ], dtype=float)
-        t = numpy.diag(pos) @ numpy.ones(corners.shape, dtype=float)
+        t = numpy.diag(top_left_corner_pos) @ numpy.ones(corners.shape, dtype=float)
         R = Rotation.from_euler('z', rotation, degrees=True).as_matrix()[:2,:2]
         S = numpy.diag([width, height])
-        return (t + R @ S @ corners).round().astype(int).T.tolist()
-
-
-    def static_rectangle(self, color, width, height, top_left_corner_pos, rotation=0, alpha=255):
-
-        # Setup color
-        c = pygame.Color(color)
-        c.a = alpha
-
-        # Generate points of rectangle
-        points = self._gen_rect_points(top_left_corner_pos, width, height, rotation)
+        points = (t + R @ S @ corners).round().astype(int).T.tolist()
 
         # Draw on temp surface
         lx, ly = zip(*points)
@@ -161,24 +156,11 @@ class Viewer:
         pygame.draw.polygon(shape_surf, c, [(x - min_x, y - min_y) for x, y in points])
 
         # Draw on surface
-        self.static_surface.blit(shape_surf, target_rect)
+        surface.blit(shape_surf, target_rect)
+
+    def static_rectangle(self, color, width, height, top_left_corner_pos, rotation=0, alpha=255):
+        self._rectangle(self.static_surface, color, width, height, top_left_corner_pos, rotation=rotation, alpha=alpha)
 
 
     def rectangle(self, color, width, height, top_left_corner_pos, rotation=0, alpha=255):
-
-        # Setup color
-        c = pygame.Color(color)
-        c.a = alpha
-
-        # Generate points of rectangle
-        points = self._gen_rect_points(top_left_corner_pos, width, height, rotation)
-
-        # Draw on temp surface
-        lx, ly = zip(*points)
-        min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
-        target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
-        shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
-        pygame.draw.polygon(shape_surf, c, [(x - min_x, y - min_y) for x, y in points])
-
-        # Draw on surface
-        self.surface.blit(shape_surf, target_rect)
+        self._rectangle(self.surface, color, width, height, top_left_corner_pos, rotation=rotation, alpha=alpha)

@@ -16,6 +16,7 @@ class Screen(Viewer):
         # Setup screen
         self.screen = pygame.display.set_mode(self.static_surface.get_size())
         pygame.display.set_caption(self.config.get('caption', 'pygame_teleop'))
+        self.clock = pygame.time.Clock()
 
         self._init_windows()
 
@@ -38,9 +39,11 @@ class Screen(Viewer):
             window.reset()
 
 
-    def final(self):
+    def final(self, hz=None):
         self.screen.blit(self.surface, (0, 0))
         windows = sorted(self.windows.values(), key=lambda x: x.z_order)
         for window in windows:
             self.screen.blit(window.surface, window.config['origin'])
         pygame.display.flip()
+        if isinstance(hz, int):
+            self.clock.tick_busy_loop(hz)
